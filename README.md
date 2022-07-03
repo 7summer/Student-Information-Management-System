@@ -9,6 +9,11 @@ I will change the system in the future
 ## Function Introduction
 <!--ts-->
    * [Input-Information](#Input-Information)
+   * [Ouput-Information](#Ouput-Information)
+   * [Save-to-file](#Save-to-file)
+   * [Delete-Student-Information](#Delete-Student-Information)
+   * [Change-Student-Information](#Change-Student-Information)
+   * [Find-Student-Information](#Find-Student-Information)
 <!--te-->
 
 
