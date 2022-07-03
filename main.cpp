@@ -3,133 +3,137 @@
 #include <string.h>
 struct student
 {
-	long Id;
-	char Name[10];
-	char Sex;
-	int Age;
-	char Note[100];
+	long Id; //学号
+	char Name[10]; //姓名
+	char Sex; //性别
+	int Age; //年龄
+	char Note[100]; //备注
 	struct student *next;
 };
 struct student* Input_Information(struct student *head,int n);
-void Printf_Link(struct student *head);
-void Save_to_File(struct student *head,int n);
-struct student* Delete_Information(struct student *head,int *pn);
-struct student* Change_Information(struct student *head);
-struct student* Look_Up(struct student *head,long id); 
-//查看需要修改的学生是否存在，然后返回该学生在链表的位置 
-void Change_Information_Id(long *id);
-void Change_Information_Name(char *name);
-void Change_Information_Sex(char *sex);
-void Change_Information_Age(int *age);
-void Change_Information_Note(char *note);
-void Find_Information(struct student *head,int n);
+struct student* Look_Up(struct student *head,long id); //如果链表中有学号为id的学生，则返回该结点的地址
+void Printf_Link(struct student *head); //打印学生信息
+void Save_to_File(struct student *head,int n); //将学生信息保存到电脑
+struct student* Ouput_from_File(struct student *head,int *pn);
+struct student* Delete_Information(struct student *head,int *pn); //*pn是学生个数
+void Change_Information(struct student *head);
+void Find_Information(struct student *head,int n); //n代表学生个数
 void Find_Information_Id(struct student *head,int n);
 void Find_Information_Name(struct student *head,int n);
 void Find_Information_Sex(struct student *head,int n);
 void Find_Information_Age(struct student *head,int n);
-void DelteMemory(struct student *head);  //释放链表 
+void DelteMemory(struct student **head);
 int main()
 {
-	char Real_secret[]="123456789";
+	char Real_secret[]="123456";
 	char secret[20];
 	struct student *head=NULL;
-	int sum=0; //记录学生总数 
-	int n;  //记录录入的学生数目 
+	int sum=0; //记录学生总数  
 	int i;
 	int *pn=&sum;
-	char ch; //ch1是用来选择功能项,ch2是用来选择查询类型
+    int choice;
 	printf("请输入密码:");
-	scanf("%s",secret); 
-	if(!strcmp(secret,Real_secret))
-	{
-		printf("How many student?\n");
-		scanf("%d",&n);
-		sum += n;
+	again:scanf("%s",secret); 
+    if(!strcmp(secret,Real_secret))
+    {
 		do
 		{
-			printf("请选择系统功能项：\n\
-		a.学生基本信息录入\n\
-		b.学生基本信息显示\n\
-		c.学生基本信息保存\n\
-		d.学生基本信息删除\n\
-		e.学生基本信息修改（要求先输入密码）\n\
-		f.学生基本信息查询\n\
-			(1)按学号查询\n\
-			(2)按姓名查询\n\
-			(3)按性别查询\n\
-			(4)按年龄查询\n\
-		g. 退出系统\n");
-			scanf(" %c",&ch);
-			switch(ch)
-			{
-				case 'a':
-					for(i=0;i<n;i++)
+			printf("请选择系统功能项:\n\
+	1.学生基本信息录入\n\
+	2.学生基本信息显示\n\
+	3.学生基本信息保存\n\
+    4.读取学生基本信息\n\
+	5.学生基本信息删除\n\
+	6.学生基本信息修改（要求先输入密码）\n\
+	7.学生基本信息查询\n\
+	8.退出系统\n");
+			scanf("%d%*c",&choice);
+            switch (choice)
+            {
+                case 1:
+					if(sum)
 					{
-						head=Input_Information(head,i);
+						DelteMemory(&head);
 					}
-					break;
-				case 'b':
+                    printf("请输入学生数量:");
+                    scanf("%d",&sum);
+					{
+						for(i=1;i<=sum;i++)
+						{
+							head=Input_Information(head,i);
+						}
+					}
+                    break;
+				case 2:
 					Printf_Link(head);
-					break;
-				case 'c':
+					break;                
+				case 3:
 					Save_to_File(head,sum);
 					break;
-				case 'd':
+                case 4:
+					Ouput_from_File(head,pn);
+                    break;
+                case 5:
 					head=Delete_Information(head,pn);
 					break;
-				case 'e':
-					head=Change_Information(head);
+				case 6:
+					Change_Information(head);
 					break;
-				case 'f':
+				case 7:
 					Find_Information(head,sum);
 					break;
-				case 'g':
-					DelteMemory(head);
-					printf("已退出\n");
+				case 8:
+					DelteMemory(&head);
 					break;
-				default:
+                default:
 					printf("输入错误!\n");
-					break;
-			}	
-		}while(ch!='g');		
-	}
-	else
-	{
-		printf("密码错误!\n");
-	}
-	return 0;
+                    break;
+            }
+        }while(choice!=8);
+    }
+    else
+    {
+        printf("输入错误!\n");
+        printf("请重新输入:");
+        goto again;
+    }
 }
 struct student* Input_Information(struct student *head,int n)
 {
-	struct student *p=NULL,*temp=head;
+	struct student *p=NULL,*q=head;
+    struct student *temp;
 	p=(struct student*)malloc(sizeof(struct student));
-	if(p==NULL)
-	{
-		printf("没有足够的空间!\n");
-		exit(0);
-	}
 	if(head==NULL)
 	{
 		head=p;
+        head->Id=0; //为Look_Up函数提供服务
 	}
 	else
 	{
-		while(temp->next!=NULL)
+		while(q->next!=NULL)
 		{
-			temp=temp->next;
+			q=q->next;
 		}
-		temp->next=p;
+		q->next=p;
 	}
-	printf("请输入第%d位学生的学号:",n+1);
-	scanf("%ld",&(p->Id));
-	printf("请输入第%d位学生的姓名:",n+1);
-	scanf("%s",p->Name);
-	printf("请输入第%d位学生的性别:",n+1);
-	scanf(" %c",&(p->Sex));
-	printf("请输入第%d位学生的年龄:",n+1);
-	scanf("%d",&(p->Age));
-	printf("请输入第%d位学生的备注:",n+1);
-	scanf("%s",p->Note);
+	printf("请输入第%d位学生的学号:",n);
+	again:scanf("%ld",&(p->Id));
+    temp=Look_Up(head,p->Id);
+    if(!temp)
+    {
+        printf("与(%d)%s冲突\n",temp->Id,temp->Name);
+        printf("请重新输入第%d位学生的学号:",n);
+        goto again;
+    }
+	printf("请输入第%d位学生的姓名:",n);
+	scanf("%s%*c",p->Name);
+	printf("请输入第%d位学生的性别:",n);
+	scanf("%c%*c",&(p->Sex));
+	printf("请输入第%d位学生的年龄:",n);
+	scanf("%d%*c",&(p->Age));
+	printf("请输入第%d位学生的备注:",n);
+	scanf("%s%*c",p->Note);
+	printf("%d\t%s\t%c\t%d\t%s\n",p->Id,p->Name,p->Sex,p->Age,p->Note);
 	p->next=NULL;
 	return head;
 }
@@ -148,13 +152,9 @@ void Save_to_File(struct student *head,int n)
 	struct student *p=head;
 	FILE *fp=NULL;
 	int i;
-	fp=fopen("C:\\Users\\33278\\Desktop\\学生信息文档.txt","a+");
-	if(fp==NULL)
-	{
-		printf("无法打开该文件!\n");
-		exit(0);
-	}
-	for(i=0;i<n;i++)
+	fp=fopen("F:\\学生信息文档.txt","w");
+	fprintf(fp,"学生数量:%d\n",n);
+	for(i=1;i<=n;i++)
 	{
 		fprintf(fp,"%ld\t%s\t%c\t%d\t%s\n",p->Id,p->Name,
 		p->Sex,p->Age,p->Note);
@@ -163,18 +163,39 @@ void Save_to_File(struct student *head,int n)
 	printf("保存成功!\n");
 	fclose(fp);
 }
+struct student* Ouput_from_File(struct student *head,int *pn)
+{
+	if(*pn)
+	{
+		DelteMemory(&head);
+		*pn=0;
+	}
+	FILE *fp=NULL;
+	struct student *p=head,*q;
+	head=(struct student*)malloc(sizeof(struct student));
+	head->next=NULL;
+	int i;
+	fp=fopen("F:\\学生信息文档.txt","r");
+	fscanf(fp,"学生数量:%d\n",pn);
+	for(i=1;i<=*pn;i++)
+	{
+		q=(struct student*)malloc(sizeof(struct student));
+		fscanf(fp,"%ld\t%s\t%c\t%d\t%s\n",&q->Id,q->Name,&q->Sex
+		,&q->Age,q->Note);
+		p->next=q;
+		p=p->next;
+		q->next=NULL;
+	}
+	return head;
+}
 struct student* Delete_Information(struct student *head,int *pn)
 {
 	long id;
 	struct student *p=head,*temp=NULL;
 	printf("请输入你需要删除学生的学号:");
-	scanf("%ld",&id);
-	while(p->next!=NULL&&id!=(p->Id))
-	{
-		temp=p;
-		p=p->next;
-	}
-	if(id==(p->Id))
+	scanf("%ld%*c",&id);
+    temp=Look_Up(head,id);
+	if(temp)
 	{
 		if(p==head)
 		{
@@ -184,7 +205,7 @@ struct student* Delete_Information(struct student *head,int *pn)
 		{
 			temp->next=p->next;
 		}
-		(*pn)--; //删除学生后，学生总数减1 
+		(*pn)--; //删除学生后，学生总数减1
 		free(p);
 	}
 	else
@@ -193,13 +214,13 @@ struct student* Delete_Information(struct student *head,int *pn)
 	}
 	return head;
 }
-struct student* Change_Information(struct student *head)
+void Change_Information(struct student *head)
 {
-	char Real_secret[]="123456789";
+	char Real_secret[]="123456";
 	char secret[20];
 	long id;
 	int ch;
-	struct student *position=NULL;
+	struct student *position=NULL,*temp;
 	printf("请输入密码:");
 	scanf("%s",secret);
 	if(!strcmp(secret,Real_secret))
@@ -213,115 +234,112 @@ struct student* Change_Information(struct student *head)
 		}
 		else
 		{
-			printf("%ld\t%s\t%c\t%d\t%s\n",position->Id
-			,position->Name,position->Sex,position->Age,
-			position->Note);
-			printf("请选择你需要修改的信息:\n\
+			do
+			{
+				printf("%ld\t%s\t%c\t%d\t%s\n",position->Id
+				,position->Name,position->Sex,position->Age,
+				position->Note);
+				printf("请选择你需要修改的信息:\n\
 	(1)学号\n\
 	(2)姓名\n\
 	(3)性别\n\
 	(4)年龄\n\
-	(5)备注\n");
-			scanf("%d",&ch);
-			switch(ch)
-			{
-				case 1:
-					Change_Information_Id(&(position->Id));
-					printf("修改成功\n");
-					break;
-				case 2:
-					Change_Information_Name(position->Name);
-					printf("修改成功\n");
-					break;
-				case 3:
-					Change_Information_Sex(&(position->Sex));
-					printf("修改成功\n");
-					break;
-				case 4:
-					Change_Information_Age(&(position->Age));
-					printf("修改成功\n");
-					break;
-				case 5:
-					Change_Information_Note(position->Note);
-					printf("修改成功\n");
-					break;
-				default:
-					printf("输入错误!\n");
-					break;
-			}
+	(5)备注\n\
+	(6)退出");
+				scanf("%d",&ch);
+				switch(ch)
+				{
+					case 1:
+						printf("请输入学号:");
+						again:scanf("%ld%*c",&id);
+						temp=Look_Up(head,id);
+						if(temp==position)
+						{
+							printf("修改后的学号(%d)与没修改之前相同\n",position->Id);
+						}
+						else if(temp!=NULL)
+						{
+							printf("与(%d)%s冲突\n",temp->Id,temp->Name);
+							printf("请重新输入:");
+							goto again;
+						}
+						else
+						{
+							position->Id=id;
+							printf("修改成功\n");
+						}
+						break;
+					case 2:
+						printf("请输入名字:");
+						scanf("%s%*c",position->Name);
+						printf("修改成功\n");
+						break;
+					case 3:
+						printf("请输入性别:");
+						scanf("%c%*c",&position->Sex);
+						printf("修改成功\n");
+						break;
+					case 4:
+						printf("请输入年龄:");
+						scanf("%d%*c",&position->Age);
+						printf("修改成功\n");
+						break;
+					case 5:
+						printf("请输入备注:");
+						scanf("%s%*c",position->Note);
+						printf("修改成功\n");
+						break;
+					case 6:
+						printf("谢谢!\n");
+						break;
+					default:
+						printf("输入错误!\n");
+						break;
+				}
+				printf("%d\t%s\t%c\t%d\t%s\n",position->Id,position->Name,position->Sex,position->Age,
+				position->Note);
+			} while (ch!=6);
 		}
 	}
 	else
 	{
 		printf("密码输入错误!\n");
 	}
-	return head;
-}
-struct student* Look_Up(struct student *head,long id)
-{
-	struct student *p=head;
-	while(p!=NULL&&id!=(p->Id))  //寻找学生的位置 
-	{
-		p=p->next;
-	}
-	return p;
-}
-void Change_Information_Id(long *id)
-{
-	printf("请输入学号:");
-	scanf("%ld",id);
-}
-void Change_Information_Name(char *name)
-{
-	char str[10];
-	printf("请输入名字:");
-	scanf("%s",str);
-	strcpy(name,str);
-}
-void Change_Information_Sex(char *sex)
-{
-	printf("请输入性别:");
-	scanf(" %c",sex);
-}
-void Change_Information_Age(int *age)
-{
-	printf("请输入年龄:");
-	scanf("%d",age);
-}
-void Change_Information_Note(char *note)
-{
-	char str[100];
-	printf("请输入备注:");
-	scanf("%s",str);
-	strcpy(note,str);
 }
 void Find_Information(struct student *head,int n)
 {
 	int ch;
-	printf("请选择查询方式:\n\
+	do
+	{
+		printf("请选择查询方式:\n\
 	(1)按学号查询\n\
 	(2)按姓名查询\n\
 	(3)按性别查询\n\
-	(4)按年龄查询\n");
-	scanf("%d",&ch);
-	switch(ch)
-	{
-		case 1:
-			Find_Information_Id(head,n);
-			break;
-		case 2:
-			Find_Information_Name(head,n);
-			break;
-		case 3:
-			Find_Information_Sex(head,n);
-			break;
-		case 4:
-			Find_Information_Age(head,n);
-			break;
-		default:
-			printf("输入错误!\n");
-			break;
-	}
+	(4)按年龄查询\n\
+	(5)退出");
+		scanf("%d%*c",&ch);
+		switch(ch)
+		{
+			case 1:
+				Find_Information_Id(head,n);
+				break;
+			case 2:
+				Find_Information_Name(head,n);
+				break;
+			case 3:
+				Find_Information_Sex(head,n);
+				break;
+			case 4:
+				Find_Information_Age(head,n);
+				break;
+			case 5:
+				printf("谢谢!\n");
+				break;
+			default:
+				printf("输入错误!\n");
+				break;
+		}
+	} while (ch!=5);
 }
 void Find_Information_Id(struct student *head,int n)
 {
@@ -415,13 +433,23 @@ void Find_Information_Age(struct student *head,int n)
 		printf("没有找到该年龄!\n");
 	}	
 }
-void DelteMemory(struct student *head)
+void DelteMemory(struct student **head)
 {
-	struct student *p=NULL,*temp=head;
+	struct student *p=NULL,*temp=*head;
 	while(temp!=NULL)
 	{
 		p=temp;
 		temp=temp->next;
 		free(p);
 	}
+	*head=NULL;
+}
+struct student* Look_Up(struct student *head,long id)
+{
+	struct student *p=head;
+	while(p!=NULL&&id!=(p->Id))  //寻找学生的位置 
+	{
+		p=p->next;
+	}
+	return p;
 }
