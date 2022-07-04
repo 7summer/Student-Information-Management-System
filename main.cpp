@@ -11,6 +11,7 @@ struct student
 	struct student *next;
 };
 struct student* Input_Information(struct student *head,int n);
+void add_Information(struct student **head,int *pn);
 struct student* Look_Up(struct student *head,long id); //如果链表中有学号为id的学生，则返回该结点的地址
 void Printf_Link(struct student *head); //打印学生信息
 void Save_to_File(struct student *head,int n); //将学生信息保存到电脑
@@ -22,12 +23,15 @@ void Find_Information_Id(struct student *head,int n);
 void Find_Information_Name(struct student *head,int n);
 void Find_Information_Sex(struct student *head,int n);
 void Find_Information_Age(struct student *head,int n);
+void QuickSort(struct student **data,int sum); //快速排序
+void HoareSort(struct student **data,int low,int high);
 void DelteMemory(struct student **head);
 int main()
 {
 	char Real_secret[]="123456";
 	char secret[20];
-	struct student *head=NULL;
+	struct student *head=NULL,*p;
+	struct student **data=NULL;
 	int sum=0; //记录学生总数  
 	int i;
 	int *pn=&sum;
@@ -40,13 +44,15 @@ int main()
 		{
 			printf("请选择系统功能项:\n\
 	1.学生基本信息录入\n\
-	2.学生基本信息显示\n\
-	3.学生基本信息保存\n\
-    4.读取学生基本信息\n\
-	5.学生基本信息删除\n\
-	6.学生基本信息修改（要求先输入密码）\n\
-	7.学生基本信息查询\n\
-	8.退出系统\n");
+	2.添加学生信息\n\
+	3.学生基本信息显示\n\
+	4.学生基本信息保存\n\
+    5.读取学生基本信息(先读取再添加)\n\
+	6.学生基本信息删除\n\
+	7.学生基本信息修改(要求先输入密码)\n\
+	8.学生基本信息查询\n\
+	9.按学号排序\n\
+	10.退出系统\n");
 			scanf("%d%*c",&choice);
             switch (choice)
             {
@@ -65,31 +71,57 @@ int main()
 					}
                     break;
 				case 2:
+					add_Information(&head,pn);
+					break;
+				case 3:
 					Printf_Link(head);
 					break;                
-				case 3:
+				case 4:
 					Save_to_File(head,sum);
 					break;
-                case 4:
-					Ouput_from_File(head,pn);
-                    break;
                 case 5:
+					head=Ouput_from_File(head,pn);
+                    break;
+                case 6:
 					head=Delete_Information(head,pn);
 					break;
-				case 6:
+				case 7:
 					Change_Information(head);
 					break;
-				case 7:
+				case 8:
 					Find_Information(head,sum);
 					break;
-				case 8:
+				case 9:
+					{
+						data=(struct student**)malloc(sizeof(struct student*)*(sum+1));
+						p=head;
+						for(i=1;i<=sum;i++)
+						{
+							data[i]=p;
+							p=p->next;
+						}
+					}
+					QuickSort(data,sum);
+					{
+						head=data[1];
+						p=head;
+						for(i=2;i<=sum;i++)
+						{
+							p->next=data[i];
+							p=p->next;
+						}
+						p->next=NULL;
+					}
+					printf("已排序!\n");
+					break;
+				case 10:
 					DelteMemory(&head);
 					break;
                 default:
 					printf("输入错误!\n");
                     break;
             }
-        }while(choice!=8);
+        }while(choice!=10);
     }
     else
     {
@@ -117,9 +149,9 @@ struct student* Input_Information(struct student *head,int n)
 		q->next=p;
 	}
 	printf("请输入第%d位学生的学号:",n);
-	again:scanf("%ld",&(p->Id));
+	again:scanf("%ld%*c",&(p->Id));
     temp=Look_Up(head,p->Id);
-    if(!temp)
+	if(temp && p!=temp)
     {
         printf("与(%d)%s冲突\n",temp->Id,temp->Name);
         printf("请重新输入第%d位学生的学号:",n);
@@ -127,7 +159,7 @@ struct student* Input_Information(struct student *head,int n)
     }
 	printf("请输入第%d位学生的姓名:",n);
 	scanf("%s%*c",p->Name);
-	printf("请输入第%d位学生的性别:",n);
+	printf("请输入第%d位学生的性别(M/W):",n);
 	scanf("%c%*c",&(p->Sex));
 	printf("请输入第%d位学生的年龄:",n);
 	scanf("%d%*c",&(p->Age));
@@ -136,6 +168,10 @@ struct student* Input_Information(struct student *head,int n)
 	printf("%d\t%s\t%c\t%d\t%s\n",p->Id,p->Name,p->Sex,p->Age,p->Note);
 	p->next=NULL;
 	return head;
+}
+void add_Information(struct student **head,int *pn)
+{
+	*head=Input_Information(*head,++(*pn));
 }
 void Printf_Link(struct student *head)
 {
@@ -171,9 +207,9 @@ struct student* Ouput_from_File(struct student *head,int *pn)
 		*pn=0;
 	}
 	FILE *fp=NULL;
-	struct student *p=head,*q;
+	struct student *p,*q;
 	head=(struct student*)malloc(sizeof(struct student));
-	head->next=NULL;
+	p=head;
 	int i;
 	fp=fopen("F:\\学生信息文档.txt","r");
 	fscanf(fp,"学生数量:%d\n",pn);
@@ -186,32 +222,48 @@ struct student* Ouput_from_File(struct student *head,int *pn)
 		p=p->next;
 		q->next=NULL;
 	}
+	p=head;
+	head=head->next;
+	free(p);
+	printf("读取成功!\n");
 	return head;
 }
 struct student* Delete_Information(struct student *head,int *pn)
 {
 	long id;
-	struct student *p=head,*temp=NULL;
-	printf("请输入你需要删除学生的学号:");
-	scanf("%ld%*c",&id);
-    temp=Look_Up(head,id);
-	if(temp)
+	struct student *p=head,*temp=NULL,*position;
+	do
 	{
-		if(p==head)
+		for(position=head;position!=NULL;position=position->next)
 		{
-			head=p->next;
+			printf("%ld\t%s\t%c\t%d\t%s\n",position->Id,position->Name,position->Sex,position->Age,position->Note);
+		}
+		printf("请输入你需要删除学生的学号(输入0结束):");
+		scanf("%ld%*c",&id);
+		while(p->next!=NULL&&id!=(p->Id))
+		{
+			temp=p;
+			p=p->next;
+		}
+		if(id==(p->Id))
+		{
+			if(p==head)
+			{
+				head=p->next;
+			}
+			else
+			{
+				temp->next=p->next;
+			}
+			(*pn)--; //删除学生后，学生总数减1
+			free(p);
+			printf("删除成功!\n");
 		}
 		else
 		{
-			temp->next=p->next;
+			printf("没有找到该学号!\n");
 		}
-		(*pn)--; //删除学生后，学生总数减1
-		free(p);
-	}
-	else
-	{
-		printf("没有找到该学号!\n");
-	}
+	} while (id!=0);
 	return head;
 }
 void Change_Information(struct student *head)
@@ -222,84 +274,89 @@ void Change_Information(struct student *head)
 	int ch;
 	struct student *position=NULL,*temp;
 	printf("请输入密码:");
-	scanf("%s",secret);
+	scanf("%s%*c",secret);
 	if(!strcmp(secret,Real_secret))
 	{
-		printf("请输入需要修改信息的学生学号:");
-		scanf("%ld",&id);
-		position=Look_Up(head,id);   //获取到学生在链表上的位置 
-		if(position==NULL)
+		do
 		{
-			printf("没有找到该学号的学生!\n");
-		}
-		else
-		{
-			do
+			for(position=head;position!=NULL;position=position->next)
 			{
-				printf("%ld\t%s\t%c\t%d\t%s\n",position->Id
-				,position->Name,position->Sex,position->Age,
-				position->Note);
-				printf("请选择你需要修改的信息:\n\
-	(1)学号\n\
-	(2)姓名\n\
-	(3)性别\n\
-	(4)年龄\n\
-	(5)备注\n\
-	(6)退出");
-				scanf("%d",&ch);
-				switch(ch)
+				printf("%ld\t%s\t%c\t%d\t%s\n",position->Id,position->Name,position->Sex,position->Age,position->Note);
+			}
+			printf("请输入需要修改信息的学生学号(输入0结束):");
+			scanf("%ld%*c",&id);
+			position=Look_Up(head,id);   //获取到学生在链表上的位置 
+			if(position==NULL && id!=0)
+			{
+				printf("没有找到该学号的学生!\n");
+			}
+			else if(position!=NULL)
+			{
+				do
 				{
-					case 1:
-						printf("请输入学号:");
-						again:scanf("%ld%*c",&id);
-						temp=Look_Up(head,id);
-						if(temp==position)
-						{
-							printf("修改后的学号(%d)与没修改之前相同\n",position->Id);
-						}
-						else if(temp!=NULL)
-						{
-							printf("与(%d)%s冲突\n",temp->Id,temp->Name);
-							printf("请重新输入:");
-							goto again;
-						}
-						else
-						{
-							position->Id=id;
+					printf("%ld\t%s\t%c\t%d\t%s\n",position->Id
+					,position->Name,position->Sex,position->Age,
+					position->Note);
+					printf("请选择你需要修改的信息:\n\
+		(1)学号\n\
+		(2)姓名\n\
+		(3)性别\n\
+		(4)年龄\n\
+		(5)备注\n\
+		(6)退出\n");
+					scanf("%d%*c",&ch);
+					switch(ch)
+					{
+						case 1:
+							printf("请输入学号:");
+							again:scanf("%ld%*c",&id);
+							temp=Look_Up(head,id);
+							if(temp==position)
+							{
+								printf("修改后的学号(%d)与没修改之前相同\n",position->Id);
+							}
+							else if(temp!=NULL)
+							{
+								printf("与(%d)%s冲突\n",temp->Id,temp->Name);
+								printf("请重新输入:");
+								goto again;
+							}
+							else
+							{
+								position->Id=id;
+								printf("修改成功\n");
+							}
+							break;
+						case 2:
+							printf("请输入名字:");
+							scanf("%s%*c",position->Name);
 							printf("修改成功\n");
-						}
-						break;
-					case 2:
-						printf("请输入名字:");
-						scanf("%s%*c",position->Name);
-						printf("修改成功\n");
-						break;
-					case 3:
-						printf("请输入性别:");
-						scanf("%c%*c",&position->Sex);
-						printf("修改成功\n");
-						break;
-					case 4:
-						printf("请输入年龄:");
-						scanf("%d%*c",&position->Age);
-						printf("修改成功\n");
-						break;
-					case 5:
-						printf("请输入备注:");
-						scanf("%s%*c",position->Note);
-						printf("修改成功\n");
-						break;
-					case 6:
-						printf("谢谢!\n");
-						break;
-					default:
-						printf("输入错误!\n");
-						break;
-				}
-				printf("%d\t%s\t%c\t%d\t%s\n",position->Id,position->Name,position->Sex,position->Age,
-				position->Note);
-			} while (ch!=6);
-		}
+							break;
+						case 3:
+							printf("请输入性别(M/W):");
+							scanf("%c%*c",&position->Sex);
+							printf("修改成功\n");
+							break;
+						case 4:
+							printf("请输入年龄:");
+							scanf("%d%*c",&position->Age);
+							printf("修改成功\n");
+							break;
+						case 5:
+							printf("请输入备注:");
+							scanf("%s%*c",position->Note);
+							printf("修改成功\n");
+							break;
+						case 6:
+							printf("谢谢!\n");
+							break;
+						default:
+							printf("输入错误!\n");
+							break;
+					}
+				} while (ch!=6);
+			}
+		} while (id!=0);
 	}
 	else
 	{
@@ -432,6 +489,30 @@ void Find_Information_Age(struct student *head,int n)
 	{
 		printf("没有找到该年龄!\n");
 	}	
+}
+void HoareSort(struct student **data,int low,int high)
+{
+	int i,j;
+	if(low<high)
+	{
+		i=low;
+		j=high;
+		data[0]=data[i];
+		while(i<j)
+		{
+			while(i<j && data[j]->Id >= data[0]->Id) j--;
+			data[i]=data[j];
+			while(i<j && data[i]->Id < data[0]->Id) i++;
+			data[j]=data[i];
+		}
+		data[i]=data[0];
+		HoareSort(data,low,i-1);
+		HoareSort(data,i+1,high);
+	}
+}
+void QuickSort(struct student **data,int sum)
+{
+	HoareSort(data,1,sum);
 }
 void DelteMemory(struct student **head)
 {
