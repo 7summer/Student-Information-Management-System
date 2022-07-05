@@ -20,16 +20,24 @@ The system was modified during my freshman year
 
 
 ## Input-Information
+   - You need to input the number of student firstly
    - You should input the number ,name ,sex ,ago and mark of the student
-   - 
-   
+
+# Add_Information
+   - You need to input the number ,name ,sex ,ago and mark of the student also
+
 ## Ouput-Information
    - We will output the number ,name ,sex ,ago and mark of all students
 
 ## Save-to-file
    - We will save the data to F:\\学生信息文档.txt
 
+## Ouput-from-file
+   - We will read the student data from F:\\学生信息文档 file
+
 ## Delete-Student-Information
+   - We will show the number ,name ,sex ,ago and mark of all students
+   - We will not allow you to delete student data if the student number you entered is unreasonable
    - Delete the student's information based on the number by user entered
   
 ## Change-Student-Information
@@ -37,4 +45,7 @@ The system was modified during my freshman year
    - You can modify the number ,name ,sex ,ago and mark of the student
    
 ## Find-Student-Information
-   - Depended on your search needs ,the system will output the student's complete information
+   - We can find the student's full data by the number ,name ,sex ,ago and mark of student
+   
+ ## Sorting-Number
+    - We can sort according to the size of student number
