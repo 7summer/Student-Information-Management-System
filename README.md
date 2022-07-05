@@ -1,9 +1,11 @@
 # Student-Information-Management-System
-The system was completed in my freshman C language course design  
-I will change the system in the future
+The system was modified during my freshman year
 
-> First of all, you should input the secret to enter the system  
-> What'more, you should input the number of student
+
+>You will need to input the secret of system if you want to enter the system
+>secret:123456
+> You will need to input the secret of system also if you want to modify the data of student 
+>secret:123456
 
 
 ## Function Introduction
