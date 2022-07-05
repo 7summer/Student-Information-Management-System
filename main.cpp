@@ -23,6 +23,7 @@ void Find_Information_Id(struct student *head,int n);
 void Find_Information_Name(struct student *head,int n);
 void Find_Information_Sex(struct student *head,int n);
 void Find_Information_Age(struct student *head,int n);
+void Find_Information_Mark(struct student *head,int n);
 void QuickSort(struct student **data,int sum); //快速排序
 void HoareSort(struct student **data,int low,int high);
 void DelteMemory(struct student **head);
@@ -116,6 +117,7 @@ int main()
 					break;
 				case 10:
 					DelteMemory(&head);
+					printf("谢谢!\n");
 					break;
                 default:
 					printf("输入错误!\n");
@@ -373,7 +375,8 @@ void Find_Information(struct student *head,int n)
 	(2)按姓名查询\n\
 	(3)按性别查询\n\
 	(4)按年龄查询\n\
-	(5)退出");
+	(5)按备注查询\n\
+	(6)退出\n");
 		scanf("%d%*c",&ch);
 		switch(ch)
 		{
@@ -390,6 +393,9 @@ void Find_Information(struct student *head,int n)
 				Find_Information_Age(head,n);
 				break;
 			case 5:
+				Find_Information_Mark(head,n);
+				break;
+			case 6:
 				printf("谢谢!\n");
 				break;
 			default:
@@ -489,6 +495,23 @@ void Find_Information_Age(struct student *head,int n)
 	{
 		printf("没有找到该年龄!\n");
 	}	
+}
+void Find_Information_Mark(struct student *head,int n)
+{
+	struct student *p=head;
+	char mark[100];
+	int i;
+	printf("请输入备注:");
+	scanf("%s",mark);
+	for(i=0;i<n;i++)
+	{
+		if(!strcmp(p->Note,mark))
+		{
+			printf("%ld\t%s\t%c\t%d\t%s\n",p->Id,p->Name,p->Sex
+			,p->Age,p->Note);
+		}
+		p=p->next;
+	}
 }
 void HoareSort(struct student **data,int low,int high)
 {
