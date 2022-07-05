@@ -21,6 +21,7 @@ The system was modified during my freshman year
 
 ## Input-Information
    - You should input the number ,name ,sex ,ago and mark of the student
+   - 
    
 ## Ouput-Information
    - We will output the number ,name ,sex ,ago and mark of all students
