@@ -11,11 +11,14 @@ The system was modified during my freshman year
 ## Function Introduction
 <!--ts-->
    * [Input-Information](#Input-Information)
+   * [Add_Information](#Add_Information)
    * [Ouput-Information](#Ouput-Information)
    * [Save-to-file](#Save-to-file)
+   * [Ouput-from-file](#Ouput-from-file)
    * [Delete-Student-Information](#Delete-Student-Information)
    * [Change-Student-Information](#Change-Student-Information)
    * [Find-Student-Information](#Find-Student-Information)
+   * [Sorting-Number](#Sorting-Number)
 <!--te-->
 
 
