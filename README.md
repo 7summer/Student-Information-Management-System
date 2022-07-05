@@ -51,4 +51,4 @@ The system was modified during my freshman year
    - We can find the student's full data by the number ,name ,sex ,ago and mark of student
    
  ## Sorting-Number
-    - We can sort according to the size of student number
+   - We can sort according to the size of student number
